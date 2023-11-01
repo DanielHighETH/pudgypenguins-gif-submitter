@@ -8,13 +8,20 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      fontFamily: {
+        kvant: ['var(--font-kvant)'],
+        typeType: ['var(--font-typeType)'],
+        fobble: ['var(--font-fobble)'],
+      },
+      colors: {
+        'sky-blue': '#80abff;',
+        'oxford-blue': '#00142d',
+      },
+      fontSize: {
+        '5xl': '5.052rem',
       },
     },
   },
-  plugins: [],
+  plugins: []
 }
 export default config

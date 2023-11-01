@@ -2,26 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+:root{
+  --sky-blue: #80abff;
+  --oxford-blue: #00142d;
+  --blizard-blue: #f5fdff;
+  --dark: #0f0f0f;
+  --white: #fff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+body{
+  font-family: var(--font-kvant), sans-serif;
+  background-color: var(--blizard-blue);
+  color: var(--dark);
+  font-size: 18px;
+  line-height: 28px;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+a{
+  font-weight: 600;
+  text-decoration: none;
+}
+
+h1{
+    font-family: var(--font-typeType), sans-serif;
+    color: var(--sky-blue);
+    letter-spacing: -.01em;
+    text-shadow: 3px 3px 0 var(--oxford-blue);
+    border: 1px #000;
+    font-weight: 800;
+    line-height: 1.1em;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: #00142d;
+}
+
+h3{
+  font-family: var(--font-typeType), sans-serif;
+  color: var(--oxford-blue);
+}
+
+.form-input{
+    min-height: 56px;
+    border: 3px solid var(--oxford-blue);
+    background-color: var(--white);
+    box-shadow: 8px 8px 0 0 var(--oxford-blue);
+    outline-color: var(--oxford-blue);
+    outline-offset: 0px;
+    border-radius: 7px;
+    outline-width: 0;
+    outline-style: none;
+    margin-bottom: 0;
+    padding: 14px 21px;
+    font-size: 18px;
+    line-height: 28px;
+    transition: transform .2s, border-color .2s;
+}
+
+.main-button{
+  border: 3px solid var(--oxford-blue);
+  background-color: var(--white);
+  color: var(--oxford-blue);
+  text-align: center;
+  border-radius: 10px;
+  font-family: var(--font-kvant), sans-serif;
+  font-weight: 600;
+  transition: all .2s;
+  display: inline-block;
+}
+
+.main-button:hover{
+  box-shadow: 8px 8px 0 0 var(--oxford-blue); 
+  transform: scale(1.04);
 }
