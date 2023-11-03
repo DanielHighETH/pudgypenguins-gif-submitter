@@ -1,16 +1,19 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import walletConnect from './lib/walletConnect';
 
 export default function Home() {
 
-  const [twitterUsername, setTwitterUsername] = useState('');
-  const [twitterUsernameError, setTwitterUsernameError] = useState('');
+  const [twitterUsername, setTwitterUsername] = useState<string>('');
+  const [twitterUsernameError, setTwitterUsernameError] = useState<string>('');
 
-  const [gifIdea, setGifIdea] = useState('');
-  const [gifIdeaError, setGifIdeaError] = useState('');
+  const [walletAddress, setWalletAddress] = useState<string>('');
 
-  const [penguinID, setPenguinID] = useState('');
-  const [penguinIDError, setPenguinIDError] = useState('');
+  const [gifIdea, setGifIdea] = useState<string>('');
+  const [gifIdeaError, setGifIdeaError] = useState<string>('');
+
+  const [penguinID, setPenguinID] = useState<string>('');
+  const [penguinIDError, setPenguinIDError] = useState<string>('');
 
   const handleSubmit = async () => {
     let hasError = false;
@@ -50,30 +53,46 @@ export default function Home() {
             penguinID,
           }),
         });
-  
+
         if (response.ok) {
-          const result = await response.json();
-          console.log(result);
           alert("Data successfully submitted!");
           // Reset form data
           setTwitterUsername('');
+          setWalletAddress('');
           setGifIdea('');
           setPenguinID('');
         } else {
-          const result = await response.json();
-          console.error(result.error);
           alert("Something went wrong!");
         }
       } catch (error) {
-        console.error(error);
         alert("Error while submitting data.");
       }
     }
   }
 
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("walletAddress");
+    if (savedAddress) {
+      setWalletAddress(savedAddress);
+    }
+  }, []);
+
+  const handleConnectWallet = async () => {
+    try {
+      const connectedAddress = await walletConnect("metamask");
+      if (connectedAddress) {
+        localStorage.setItem("walletAddress", connectedAddress);
+        setWalletAddress(connectedAddress);
+      }
+    } catch (error) {
+      console.error("Error connecting to wallet:", error);
+    }
+  };
+
 
   return (
     <div className='mx-72'>
+      <button id="connectWallet" onClick={handleConnectWallet}>Connect Wallet</button>
       <h1 className='text-5xl mt-5'>
         Submit Your Gif
       </h1>
@@ -93,6 +112,17 @@ export default function Home() {
           onChange={e => setTwitterUsername(e.target.value)}
         />
         {twitterUsernameError && <p className="text-red-500 mt-2">{twitterUsernameError}</p>}
+
+      </div>
+      <div className='mt-10'>
+        <h3 className='text-4xl'>Wallet Address</h3>
+        <input
+          className='form-input w-full'
+          type='text'
+          placeholder='0x000aed81...'
+          value={walletAddress}
+          onChange={e => setWalletAddress(e.target.value)}
+        />
 
       </div>
       <div className='mt-10'>
