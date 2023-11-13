@@ -3,6 +3,7 @@ import connectToDB from '@/app/lib/connectToDb';
 
 type GifSubmission = {
     twitterUsername: string;
+    userWallet: string;
     gifIdea: string;
     penguinID: string;
 };
@@ -44,8 +45,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No data provided" }, { status: 400 });
         }
 
-        const { twitterUsername, gifIdea, penguinID } = data as GifSubmission;
-        if (!twitterUsername || !gifIdea || !penguinID) {
+        const { twitterUsername, userWallet, gifIdea, penguinID } = data as GifSubmission;
+        if (!twitterUsername || !userWallet || !gifIdea || !penguinID) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
 
         const dataToInsert = {
             twitterUsername: extractedTwitterUsername,
+            userWallet,
             gifIdea,
             penguinID,
             status: 'pending',

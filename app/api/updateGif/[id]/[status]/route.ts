@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import connectToDB from '@/app/lib/connectToDb';
 import { ObjectId } from 'mongodb';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string, status: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string, status: string } }) {
     try{
         const db = await connectToDB('submissions');
         const collection = db.collection('gifs');

@@ -18,6 +18,7 @@ const config: Config = {
         'oxford-blue': '#00142d',
       },
       fontSize: {
+        '4xl': '2.441rem',
         '5xl': '5.052rem',
       },
     },

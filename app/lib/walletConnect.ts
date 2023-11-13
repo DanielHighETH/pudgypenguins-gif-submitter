@@ -10,11 +10,13 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
       console.error("Provider not initialized");
       return null;
     }
-    const network = await provider.getNetwork();
-    if (network.chainId !== 80001) {
-        console.error("Please connect to the Polygon Mumbai testnet");
-        return null
-      }
+    //no need to check network here, its just for log in
+
+    // const network = await provider.getNetwork();
+    // if (network.chainId !== 80001) {
+    //     console.error("Please connect to the Polygon Mumbai testnet");
+    //     return null
+    //   }
       // if (network.chainId !== 137) {
       //   console.error("Please connect to the Polygon Mainnet");
       //   return null
@@ -24,7 +26,7 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
     const accounts: string[] = await provider.send('eth_requestAccounts', []);
     const address: string = accounts[0];
 
-    const message = "Hello! Welcome to PudgyProfile please sign this message to prove ownership of your wallet.";
+    const message = "Hello! Welcome to PudgyPenguins Gifs please sign this message to prove ownership of your wallet.";
     const signature = await signer.signMessage(message);
 
     if (!signature) {
