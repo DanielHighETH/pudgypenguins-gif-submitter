@@ -38,6 +38,7 @@ h1 {
 h3 {
   font-family: var(--font-typeType), sans-serif;
   color: var(--oxford-blue);
+  margin-bottom: 0.3rem;
 }
 
 .form-input {

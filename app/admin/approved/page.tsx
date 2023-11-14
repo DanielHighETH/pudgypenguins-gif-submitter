@@ -2,8 +2,8 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import FilterComponent from '@/app/components/filterComponent';
-import Loader from '@/app/components/loader';
+import FilterComponent from '@/app/components/FilterComponent';
+import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 
 export default function Approved() {

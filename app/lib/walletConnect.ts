@@ -17,10 +17,10 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
     //     console.error("Please connect to the Polygon Mumbai testnet");
     //     return null
     //   }
-      // if (network.chainId !== 137) {
-      //   console.error("Please connect to the Polygon Mainnet");
-      //   return null
-      // }
+    // if (network.chainId !== 137) {
+    //   console.error("Please connect to the Polygon Mainnet");
+    //   return null
+    // }
 
     const signer: providers.JsonRpcSigner = provider.getSigner();
     const accounts: string[] = await provider.send('eth_requestAccounts', []);
@@ -28,6 +28,29 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
 
     const message = "Hello! Welcome to PudgyPenguins Gifs please sign this message to prove ownership of your wallet.";
     const signature = await signer.signMessage(message);
+
+    try {
+      const response = await fetch('/api/users/insertUser', {
+        method: 'POST',
+        body: JSON.stringify({ address, signature }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('User inserted successfully:', data);
+      } else {
+        console.error('Failed to insert user. Response:', response);
+      }
+
+    } catch (error) {
+      console.error("Failed to insert user into database:", error);
+      return null;
+    }
+
+
 
     if (!signature) {
       console.error("Failed to sign the message.");
