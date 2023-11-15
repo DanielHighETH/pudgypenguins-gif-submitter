@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import connectToDB from '../../../../lib/connectToDb';
+import connectToDB from '@/app/lib/connectToDb';
 
 export async function GET(req: NextRequest, { params }: { params: { address: string } }) {
     const db = await connectToDB('submissions');

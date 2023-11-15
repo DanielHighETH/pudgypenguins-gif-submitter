@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
-import verifySignature from '../lib/verifySignature';
-import getUserRole from '../lib/getUserRole';
+import verifySignature from '@/app/lib/verifySignature';
+import getUserRole from '@/app/lib/getUserRole';
 
 async function authorizeAdmin(req: NextRequest) {
     const walletAddress = req.headers.get('Wallet-Address');

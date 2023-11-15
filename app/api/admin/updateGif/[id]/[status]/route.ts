@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import connectToDB from '../../../../../lib/connectToDb';
+import connectToDB from '@/app/lib/connectToDb';
 import { ObjectId } from 'mongodb';
-import authorizeAdmin from '../../../../../lib/authorizeAdmin';
+import authorizeAdmin from '@/app/lib/authorizeAdmin';
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string, status: string } }) {
 

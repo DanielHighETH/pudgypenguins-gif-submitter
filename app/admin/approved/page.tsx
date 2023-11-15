@@ -2,11 +2,11 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import FilterComponent from '../../components/FilterComponent';
-import Loader from '../../components/Loader';
-import { Submission } from '../../components/interfaces';
-import OnlyAdmin from "../../components/OnlyAdmin";
-import useAuthenticatedFetch from '../../lib/authenticatedFetch';
+import FilterComponent from '@/app/components/FilterComponent';
+import Loader from '@/app/components/Loader';
+import { Submission } from '@/app/components/interfaces';
+import OnlyAdmin from "@/app/components/OnlyAdmin";
+import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 
 
 function Approved() {
