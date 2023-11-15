@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import connectWallet from '../lib/connectWallet';
 import Link from 'next/link';
 
-const Navbar = () => {
+function Navbar() {
   const [walletAddress, setWalletAddress] = useState<string>('');
   const [userRole, setUserRole] = useState<string>('');
   const router = useRouter();

@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import Loader from "@/app/components/Loader";
-import OnlyAdmin from "@/app/components/OnlyAdmin";
-import useAuthenticatedFetch from "@/app/lib/authenticatedFetch";
+import Loader from "../../../components/Loader";
+import OnlyAdmin from "../../../components/OnlyAdmin";
+import useAuthenticatedFetch from '../../../lib/authenticatedFetch';
 
 
 type GifSubmission = {

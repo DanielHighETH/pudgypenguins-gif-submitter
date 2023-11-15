@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FilterProps } from './interfaces';
 
-const FilterComponent: React.FC<FilterProps> = ({ submissions, setFilteredSubmissions }) => {
+function FilterComponent({ submissions, setFilteredSubmissions }: FilterProps): React.ReactElement {
     const [filter, setFilter] = useState('');
 
     useEffect(() => {
