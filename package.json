@@ -14,7 +14,8 @@
     "mongodb": "^6.2.0",
     "next": "14.0.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "twitter-api-sdk": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",
