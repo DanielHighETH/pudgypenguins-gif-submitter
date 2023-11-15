@@ -26,13 +26,18 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
     const accounts: string[] = await provider.send('eth_requestAccounts', []);
     const address: string = accounts[0];
 
-    const message = "Hello! Welcome to PudgyPenguins Gifs please sign this message to prove ownership of your wallet.";
+    const message = `Hello! Welcome to PudgyPenguins Gifs please sign this message to prove ownership of your wallet. Date: ${new Date().toISOString()}`;
     const signature = await signer.signMessage(message);
+
+    if (!signature) {
+      console.error("Failed to sign the message.");
+      return null;
+    }
 
     try {
       const response = await fetch('/api/users/insertUser', {
         method: 'POST',
-        body: JSON.stringify({ address, signature }),
+        body: JSON.stringify({ address, signature, message }),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -50,14 +55,11 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
       return null;
     }
 
-
-
-    if (!signature) {
-      console.error("Failed to sign the message.");
-      return null;
-    }
-
+    sessionStorage.setItem('userSignature', signature);
+    sessionStorage.setItem('signedMessage', message);
     return address;
+
+
   } catch (error) {
     console.error("Failed to connect wallet:", error);
     return null;

@@ -4,6 +4,7 @@ import connectToDB from '@/app/lib/connectToDb';
 type UserSubmission = {
     address: string;
     signature: string;
+    message: string;
 };
 
 export async function POST(req: NextRequest) {
@@ -16,19 +17,20 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "No data provided" }, { status: 400 });
     }
 
-    const { address, signature } = data as UserSubmission;
-    if (!address || !signature) {
+    const { address, signature, message } = data as UserSubmission;
+    if (!address || !signature || !message) {
         return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
 
-    const existingUser = await collection.findOne({ address });
+    const existingUser = await collection.findOne({ userWallet: address });
     if (existingUser) {
-        await collection.updateOne({ address }, { $set: { signature } });
+        await collection.updateOne({ userWallet: address }, { $set: { signature, message } });
     } else {
         const dataToInsert = {
             userWallet: address,
             signature,
+            message,
             role: 'user',
             date: new Date()
         };

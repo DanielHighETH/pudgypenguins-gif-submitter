@@ -32,9 +32,7 @@ const Navbar = () => {
 
   const fetchUserRole = async (address: string) => {
     try {
-      const response = await fetch(`/api/users/getUserRole/${address}`, {
-        next: { revalidate: 180 }
-      });
+      const response = await fetch(`/api/users/getUserRole/${address}`);
       if (response.ok) {
         const data = await response.json();
         setUserRole(data.role);

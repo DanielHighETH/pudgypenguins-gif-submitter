@@ -6,27 +6,35 @@ import FilterComponent from '@/app/components/FilterComponent';
 import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 import OnlyAdmin from "@/app/components/OnlyAdmin";
+import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 
 
 function Approved() {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(false);
+    const fetchWithAuth = useAuthenticatedFetch();
+
 
     const router = useRouter()
 
     useEffect(() => {
         setLoading(true);
-        fetch('/api/getGifs/approved')
+
+        fetchWithAuth('/api/admin/getGifs/approved')
             .then((response) => response.json())
             .then((data) => {
                 setSubmissions(data);
                 setLoading(false);
-            });
-    }, []);
+            })
+            .catch((error) => console.error('Failed to fetch:', error));
+
+    }, [fetchWithAuth]);
+    
+
 
     const rejectGif = (id: string) => {
-        fetch(`/api/updateGif/${id}/rejected`, {
+        fetchWithAuth(`/api/admin/updateGif/${id}/rejected`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {

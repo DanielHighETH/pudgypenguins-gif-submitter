@@ -6,11 +6,13 @@ import FilterComponent from '@/app/components/FilterComponent';
 import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 import OnlyAdmin from "@/app/components/OnlyAdmin";
+import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 
 function Pending() {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(false);
+    const fetchWithAuth = useAuthenticatedFetch();
 
 
     const router = useRouter()
@@ -18,16 +20,16 @@ function Pending() {
 
     useEffect(() => {
         setLoading(true);
-        fetch('/api/getGifs/pending')
+        fetchWithAuth('/api/admin/getGifs/pending')
             .then((response) => response.json())
             .then((data) => {
                 setSubmissions(data);
                 setLoading(false);
             });
-    }, []);
+    }, [fetchWithAuth]);
 
     const approveGif = (id: string) => {
-        fetch(`/api/updateGif/${id}/approved`, {
+        fetchWithAuth(`/api/admin/updateGif/${id}/approved`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
@@ -38,7 +40,7 @@ function Pending() {
     };
 
     const rejectGif = (id: string) => {
-        fetch(`/api/updateGif/${id}/rejected`, {
+        fetchWithAuth(`/api/admin/updateGif/${id}/rejected`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {

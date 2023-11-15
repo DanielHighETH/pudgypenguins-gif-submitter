@@ -6,23 +6,25 @@ import FilterComponent from '@/app/components/FilterComponent';
 import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 import OnlyAdmin from "@/app/components/OnlyAdmin";
+import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 
 function Rejected() {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(false);
+    const fetchWithAuth = useAuthenticatedFetch();
 
     const router = useRouter()
 
     useEffect(() => {
         setLoading(true);
-        fetch('/api/getGifs/rejected')
+        fetchWithAuth('/api/admin/getGifs/rejected')
             .then((response) => response.json())
             .then((data) => {
                 setSubmissions(data);
                 setLoading(false);
             });
-    }, []);
+    }, [fetchWithAuth]);
 
     return (
         <div className='xl:mx-44 md:mx-24 mx-8'>

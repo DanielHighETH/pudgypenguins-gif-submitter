@@ -9,12 +9,12 @@ export async function GET(req: NextRequest, { params }: { params: { address: str
 
     try{
         const existingUser = await collection.findOne({ userWallet: address });
-        if (existingUser && existingUser.role === 'admin' || existingUser.role === 'uploader') {
+        if (existingUser && existingUser.role === 'admin') {
             return NextResponse.json({ role: existingUser.role });
         } else {
             return NextResponse.json({ role: 'user' });
         }
     } catch(error){
-        return NextResponse.json({ error: "User not found", role: 'user' });
+        return NextResponse.json({ error: "User not found", role: null });
     }
 }

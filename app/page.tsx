@@ -48,6 +48,7 @@ export default function Home() {
           },
           body: JSON.stringify({
             twitterUsername,
+            walletAddress,
             gifIdea,
             penguinID,
           }),
@@ -57,7 +58,7 @@ export default function Home() {
           alert("Data successfully submitted!");
           // Reset form data
           setTwitterUsername('');
-          setWalletAddress('');
+          setWalletAddress(walletAddress);
           setGifIdea('');
           setPenguinID('');
         } else {

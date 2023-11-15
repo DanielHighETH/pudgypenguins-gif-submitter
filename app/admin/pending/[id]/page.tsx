@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Loader from "@/app/components/Loader";
 import OnlyAdmin from "@/app/components/OnlyAdmin";
+import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 
 type GifSubmission = {
     twitterUsername: string;
@@ -16,21 +17,22 @@ type GifSubmission = {
 function PendingDetail({ params }: { params: { id: string } }) {
     const [gif, setGif] = useState<GifSubmission | null>(null);
     const [loading, setLoading] = useState(true);
+    const fetchWithAuth = useAuthenticatedFetch();
 
     const router = useRouter();
 
     useEffect(() => {
-        fetch(`/api/getGifByID/${params.id}`)
+        fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data)
                 setGif(data.submission);
                 setLoading(false);
             });
-    }, [params.id]);
+    }, [params.id, fetchWithAuth]);
 
     const approveGif = (id: string) => {
-        fetch(`/api/updateGif/${id}/approved`, {
+        fetchWithAuth(`/api/admin/updateGif/${id}/approved`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
@@ -41,7 +43,7 @@ function PendingDetail({ params }: { params: { id: string } }) {
     };
 
     const rejectGif = (id: string) => {
-        fetch(`/api/updateGif/${id}/rejected`, {
+        fetchWithAuth(`/api/admin/updateGif/${id}/rejected`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {

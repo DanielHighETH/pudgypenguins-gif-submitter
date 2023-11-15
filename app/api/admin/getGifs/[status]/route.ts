@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import connectToDB from '@/app/lib/connectToDb';
+import authorizeAdmin from '@/app/lib/authorizeAdmin';
 
 export async function GET(req: NextRequest, { params }: { params: { status: string } }) {
+
+    const authError = await authorizeAdmin(req);
+    if (authError) {
+        return NextResponse.json({ error: authError.error }, { status: authError.status });
+    }
+
     const db = await connectToDB('submissions');
     const collection = db.collection('gifs');
 
