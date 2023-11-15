@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import Loader from "@/app/components/Loader";
-import OnlyAdmin from "@/app/components/OnlyAdmin";
+import Loader from '@/app/components/Loader';
+import OnlyAdmin from '@/app/components/OnlyAdmin';
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
-
 
 type GifSubmission = {
     twitterUsername: string;
