@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
         await collection.insertOne(dataToInsert);
 
-        return NextResponse.json({ success: true, message: 'Gif was successfully submitted', data: dataToInsert }, { status: 201 });
+        return NextResponse.json({ success: true, message: 'Gif was successfully submitted', data: dataToInsert }, { status: 200 });
     } catch (error) {
         return NextResponse.json({ error: error }, { status: 500 });
     }

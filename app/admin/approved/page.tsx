@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation'
 import FilterComponent from '@/app/components/FilterComponent';
 import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
+import OnlyAdmin from "@/app/components/OnlyAdmin";
 
-export default function Approved() {
+
+function Approved() {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
     const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
     const [loading, setLoading] = useState(false);
@@ -85,3 +87,5 @@ export default function Approved() {
         </div>
     )
 }
+
+export default OnlyAdmin(Approved);

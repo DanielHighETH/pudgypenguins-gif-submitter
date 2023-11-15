@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import walletConnect from '../lib/walletConnect';
+import connectWallet from '../lib/connectWallet';
 import Link from 'next/link';
 
 const Navbar = () => {
@@ -19,7 +19,7 @@ const Navbar = () => {
 
   const handleConnectWallet = async () => {
     try {
-      const connectedAddress = await walletConnect("metamask");
+      const connectedAddress = await connectWallet("metamask");
       if (connectedAddress) {
         localStorage.setItem("walletAddress", connectedAddress);
         setWalletAddress(connectedAddress);
@@ -32,10 +32,13 @@ const Navbar = () => {
 
   const fetchUserRole = async (address: string) => {
     try {
-      const response = await fetch(`/api/users/getUserRole/${address}`);
+      const response = await fetch(`/api/users/getUserRole/${address}`, {
+        next: { revalidate: 180 }
+      });
       if (response.ok) {
         const data = await response.json();
-        setUserRole(data.role); // Assuming the API returns an object with a 'role' field
+        setUserRole(data.role);
+        localStorage.setItem("userRole", data.role);
       }
     } catch (error) {
       console.error("Error fetching user role:", error);

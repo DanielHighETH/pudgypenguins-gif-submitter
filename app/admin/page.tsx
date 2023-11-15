@@ -1,16 +1,34 @@
+'use client'
 import React from 'react';
 import Link from 'next/link';
+import OnlyAdmin from '@/app/components/OnlyAdmin';
 
-export default function Admin() {
+function Admin() {
+
+    const adminLinks = [
+        { title: 'Pending Submissions', href: '/admin/pending', icon: '🕒' },
+        { title: 'Approved Submissions', href: '/admin/approved', icon: '✅' },
+        { title: 'Rejected Submissions', href: '/admin/rejected', icon: '❌' },
+        { title: 'Uploaded Submissions', href: '/admin/uploaded', icon: '📤' },
+        { title: 'Users', href: '/admin/users', icon: '👤' },
+        { title: 'Logs', href: '/admin/logs', icon: '📚' },
+    ];
+
     return (
-        <div className='mx-72'>
-            <h1 className='text-5xl mt-5'>Admin Page</h1>
-            <div className='flex gap-5'>
-                <Link href={'/'}>Home</Link>
-                <Link href={'/admin/pending'}>Pending Submissions</Link>
-                <Link href={'/admin/approved'}>Approved submissions</Link>
-                <Link href={'/admin/rejected'}>Rejected submissions</Link>
+        <div className='mx-auto max-w-7xl p-5'>
+            <h1 className='text-5xl text-left mb-10'>Admin Page</h1>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+                {adminLinks.map((link) => (
+                    <Link key={link.href} href={link.href} className="border rounded p-6 shadow hover:shadow-lg transition-shadow duration-300 flex flex-col items-center justify-center text-2xl">
+                            <span>{link.icon}</span>
+                            <span>{link.title}</span>
+                    </Link>
+                ))}
             </div>
         </div>
-    )
+    );
 }
+
+export default OnlyAdmin(Admin);
+
+

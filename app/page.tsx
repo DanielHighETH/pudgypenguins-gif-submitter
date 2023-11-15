@@ -96,6 +96,11 @@ export default function Home() {
           placeholder='@dhigh_eth'
           value={twitterUsername}
           onChange={e => setTwitterUsername(e.target.value)}
+          onFocus={(e) => {
+            if (!e.target.value) {
+              setTwitterUsername('@');
+            }
+          }}
         />
         {twitterUsernameError && <p className="text-red-500 mt-2">{twitterUsernameError}</p>}
 
