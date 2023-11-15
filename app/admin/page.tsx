@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 import Link from 'next/link';
-import OnlyAdmin from '@/app/components/OnlyAdmin';
+import OnlyAdmin from "../components/OnlyAdmin";
 
 function Admin() {
 

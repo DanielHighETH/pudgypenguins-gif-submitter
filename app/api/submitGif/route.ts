@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from 'next/server'
-import connectToDB from '@/app/lib/connectToDb';
+import connectToDB from '../../lib/connectToDb';
 
 type GifSubmission = {
     twitterUsername: string;
