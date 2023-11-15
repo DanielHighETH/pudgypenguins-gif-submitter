@@ -70,7 +70,20 @@ h3 {
   display: inline-block;
 }
 
+.font-kvant{
+  font-family: var(--font-kvant), sans-serif;
+}
+
 .main-button:hover {
   box-shadow: 8px 8px 0 0 var(--oxford-blue);
   transform: scale(1.04);
+}
+
+.tag-button {
+  border: 3px solid var(--sky-blue);
+  background-color: var(--white);
+  color: var(--sky-blue);
+  text-align: center;
+  border-radius: 10px;
+  transition: all .2s;
 }
