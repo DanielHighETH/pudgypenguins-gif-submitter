@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useState, ChangeEvent, DragEvent, KeyboardEvent } from "react"
+import { useEffect, useState, ChangeEvent, DragEvent, KeyboardEvent, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import Loader from '@/app/components/Loader';
 import OnlyAdmin from '@/app/components/OnlyAdmin';
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 import Image from 'next/image'
+import { useUploadThing } from "@/app/lib/useUploadThing";
+
 
 
 type GifSubmission = {
@@ -21,17 +23,68 @@ type Tag = string;
 interface Preview {
     src: string;
     type: string;
+    file: File | null;
 }
 
 function Upload({ params }: { params: { id: string } }) {
+    const giphyUsername = 'DanielHighETH';
+    //gif submission
     const [gif, setGif] = useState<GifSubmission | null>(null);
+
+    //loading
     const [loading, setLoading] = useState(true);
+
+    // form data
+    const [title, setTitle] = useState<string>('');
+    const [tagValue, setTagValue] = useState<string>('');
+    const [tags, setTags] = useState<Tag[]>([]);
+    const [urlSource, setUrlSource] = useState<string>('https://pudgypenguins.com/');
+
+
+    //preview
+    const [gifPreview, setGifPreview] = useState<Preview>({ src: '', type: '', file: null });
+    const [stickerPreview, setStickerPreview] = useState<Preview>({ src: '', type: '', file: null });
+    const [isStickerSelected, setIsStickerSelected] = useState(false);
+
+    // uploading statuses
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
-    const [uploadError, setUploadError] = useState(null);
-    const [preview, setPreview] = useState<Preview | null>(null);
-    const [tags, setTags] = useState<Tag[]>([]);
-    const [inputValue, setInputValue] = useState('');
+    const [uploadError, setUploadError] = useState<String>("");
+
+
+    //Upload Thing
+    const { startUpload, permittedFileInfo } = useUploadThing(
+        "imageUploader",
+        {
+            onClientUploadComplete: () => {
+                alert("uploaded successfully!");
+            },
+            onUploadError: () => {
+                alert("error occurred while uploading");
+            },
+            onUploadBegin: () => {
+                alert("upload has begun");
+            },
+        },
+    );
+
+    // tweet text
+
+    const randomTweetArray = [
+        "New GIF just dropped! \n\nGif Idea by: @",
+        "Checkout the new GIF! \n\nGif Idea by: @",
+        "New GIF alert! \n\nGif Idea by: @",
+        "Banger GIF just dropped! \n\nGif Idea by: @",
+        "Fresh GIF from the oven! \n\nGif Idea by: @",
+    ]
+
+    const getRandomTweet = () => {
+        const randomIndex = Math.floor(Math.random() * randomTweetArray.length);
+        return randomTweetArray[randomIndex];
+    }
+
+    const [tweetText, setTweetText] = useState(getRandomTweet());
+
 
 
     const fetchWithAuth = useAuthenticatedFetch();
@@ -43,11 +96,12 @@ function Upload({ params }: { params: { id: string } }) {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data)
                 setGif(data.submission);
+                setTweetText(prevTweetText => `${prevTweetText}${data.submission.twitterUsername}`)
                 setLoading(false);
             });
     }, [params.id, fetchWithAuth]);
+
 
     if (loading) {
         return <Loader />;
@@ -57,55 +111,16 @@ function Upload({ params }: { params: { id: string } }) {
         return <div>No submission found.</div>;
     }
 
-    function handleTitleChange(event: React.ChangeEvent<HTMLInputElement>) {
-        //handle title change
-    }
-
-    function handleSourceChange(event: React.ChangeEvent<HTMLInputElement>) {
-        //handle source change
-    }
-
-    function handleUpload(event: React.FormEvent<HTMLFormElement>) {
-        //handle upload
-    }
-
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files ? event.target.files[0] : null;
-        if (file) createPreview(file);
-    };
-
-    const handleFileDrop = (event: DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-        const file = event.dataTransfer.files[0];
-        createPreview(file);
-    };
-
-    const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-        event.preventDefault();
-    };
-
-    const createPreview = (file: File) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPreview({ src: reader.result as string, type: file.type });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value);
-    };
-
+    //TAGS
     const handleInputKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            if (inputValue) {
-                createTagsFromString(inputValue.trim());
-                setInputValue('');
+            if (tagValue) {
+                createTagsFromString(tagValue.trim());
+                setTagValue('');
             }
         }
     };
-
 
     const createTagsFromString = (input: string) => {
         const newTags = input.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
@@ -117,11 +132,90 @@ function Upload({ params }: { params: { id: string } }) {
     };
 
     const handleAddClick = () => {
-        if (inputValue) {
-            createTagsFromString(inputValue.trim());
-            setInputValue('');
+        if (tagValue) {
+            createTagsFromString(tagValue.trim());
+            setTagValue('');
         }
     };
+
+    //FILE
+
+    const handleFileChange = (event: ChangeEvent<HTMLInputElement>, isSticker: boolean = false) => {
+        const file = event.target.files ? event.target.files[0] : null;
+        if (file) processFile(file, isSticker);
+    };
+
+    const handleFileDrop = (event: DragEvent<HTMLDivElement>, isSticker: boolean = false) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files[0];
+        processFile(file, isSticker);
+    };
+
+    const handleStickerToggle = () => {
+        setIsStickerSelected(!isStickerSelected);
+    };
+
+    const processFile = async (file: File, isSticker: boolean) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            const result = { src: reader.result as string, type: file.type, file };
+            isSticker ? setStickerPreview(result) : setGifPreview(result);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+        setUploading(true);
+        let gifUrl = '';
+        let stickerUrl = '';
+        if (stickerPreview.file) {
+            const start = await startUpload([gifPreview.file as File, stickerPreview.file as File])
+            if (start) {
+                gifUrl = start[0].url;
+                stickerUrl = start[1].url;
+            }
+        } else {
+            const start = await startUpload([gifPreview.file as File])
+            if (start) {
+                gifUrl = start[0].url;
+            }
+        }
+        const commaTags = tags.join(',');
+
+        const body = {
+            title,
+            username: giphyUsername,
+            tags: commaTags,
+            source_post_url: urlSource,
+            file: gifUrl,
+            sticker: stickerUrl,
+            tweetText,
+        }
+
+        try {
+            await fetchWithAuth(`/api/admin/uploadGif/${params.id}`, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data)
+                    setUploadSuccess(true);
+                    setUploading(false);
+                    alert("Fully uploaded")
+                    //send alert
+                    //router.push('/admin/approved');
+                });
+        } catch (error) {
+            console.error(error)
+            setUploadError(error as String);
+            setUploading(false);
+        }
+    }
 
 
 
@@ -148,20 +242,25 @@ function Upload({ params }: { params: { id: string } }) {
                     </div>
 
                     <div className='bg-white shadow-lg rounded-lg p-6 mt-10'>
-                        {/* TODO: Change it from form to not form */}
                         <form onSubmit={handleUpload} className="upload-form space-y-6">
                             <div>
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl mt-5'>GIF Title</h3>
-                                <input type="text" placeholder="Snow Ball Fight" onChange={handleTitleChange} required className="form-input w-full" />
+                                <input
+                                    type="text"
+                                    placeholder="Snow Ball Fight"
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    required
+                                    className="form-input w-full"
+                                />
                             </div>
                             <div className="flex flex-col">
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl mt-5'>GIF Tags</h3>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
-                                        value={inputValue}
+                                        value={tagValue}
                                         placeholder="Pudgy Penguins, snow fight, snowball"
-                                        onChange={handleInputChange}
+                                        onChange={(e) => setTagValue(e.target.value)}
                                         onKeyDown={handleInputKeyDown}
                                         className="form-input w-full"
                                     />
@@ -183,42 +282,96 @@ function Upload({ params }: { params: { id: string } }) {
                             </div>
                             <div>
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl'>Source URL</h3>
-                                <input type="url" placeholder="https://pudgypenguins.com/" onChange={handleSourceChange} defaultValue={"https://pudgypenguins.com/"} className="form-input w-full" />
+                                <input type="url"
+                                    placeholder="https://pudgypenguins.com/"
+                                    onChange={(e) => setUrlSource(e.target.value)}
+                                    defaultValue={urlSource}
+                                    className="form-input w-full" />
                             </div>
                             <div>
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl'>Tweet text</h3>
-                                <textarea rows={4} placeholder="https://pudgypenguins.com/" defaultValue={`New GIF just dropped! \n\nGif Idea by: @${gif.twitterUsername}`} className="form-input w-full" />
+                                <textarea
+                                    rows={4}
+                                    placeholder="https://pudgypenguins.com/"
+                                    defaultValue={`${tweetText}`}
+                                    onChange={(e) => setTweetText(e.target.value)}
+                                    className="form-input w-full" />
                             </div>
                             <div>
-                                <h3 className='text-2xl md:text-3xl lg:text-4xl pt-5'>GIF Image</h3>
-                                <div className="file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center"
-                                    onDragOver={handleDragOver}
+                                <h3 className='text-2xl md:text-3xl lg:text-4xl pt-5'>Gif & Sticker Upload</h3>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" onChange={handleStickerToggle} className="form-checkbox" />
+                                    <span>Add a Sticker to Your GIF</span>
+                                </label>
+                            </div>
+
+                            <div className="flex gap-4 mt-4">
+                                <div className={`file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center ${isStickerSelected ? 'w-1/2' : 'w-full'}`}
+                                    onDragOver={(e) => e.preventDefault()}
                                     onDrop={handleFileDrop}>
                                     <input type="file"
-                                        id="file-upload"
+                                        id="gif-upload"
                                         onChange={handleFileChange}
                                         accept="image/gif,video/mp4,video/mov,video/webm"
                                         required
                                         hidden />
-                                    <label htmlFor="file-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
+                                    <label htmlFor="gif-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
                                         <Image
                                             src="/upload.png"
                                             width={75}
                                             height={75}
-                                            alt="Upload icon"
+                                            alt="Upload GIF icon"
                                         />
                                         <p className="mt-5">
-                                            Drag and drop your gif here or <span className="text-sky-blue underline cursor-pointer">click to select the gif</span>
+                                            Drag and drop your <strong>GIF</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the GIF</span>
                                         </p>
                                     </label>
                                 </div>
-                                {preview && (
-                                    <div className="preview flex justify-center mt-4">
-                                        {preview.type.startsWith('image/') ? (
-                                            <Image src={preview.src} alt="Preview" width={250} height={250} className="block" />
-                                        ) : (
-                                            <video src={preview.src} controls className="max-w-full h-auto" />
-                                        )}
+                                {isStickerSelected && (
+                                    <div className="file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center w-1/2"
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={(e) => handleFileDrop(e, true)}>
+                                        <input type="file"
+                                            id="sticker-upload"
+                                            onChange={(e) => handleFileChange(e, true)}
+                                            accept="image/gif,video/mp4,video/mov,video/webm"
+                                            required
+                                            hidden />
+                                        <label htmlFor="sticker-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
+                                            <Image
+                                                src="/upload.png"
+                                                width={75}
+                                                height={75}
+                                                alt="Upload Sticker icon"
+                                            />
+                                            <p className="mt-5">
+                                                Drag and drop your <strong>Sticker</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the Sticker</span>
+                                            </p>
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex w-full">
+                                <div className={`${isStickerSelected ? 'w-1/2' : 'w-full'}`}>
+                                    {(gifPreview && gifPreview.src) && (
+                                        <div className="preview flex justify-center mt-4">
+                                            {gifPreview.type.startsWith('image/') ? (
+                                                <Image src={gifPreview.src} alt="Preview" width={250} height={250} className="block main-button" />
+                                            ) : (
+                                                <video src={gifPreview.src} controls className="max-w-full h-auto" />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                {(stickerPreview && stickerPreview.src && isStickerSelected) && (
+                                    <div className="w-1/2">
+                                        <div className="preview flex justify-center mt-4">
+                                            {stickerPreview.type.startsWith('image/') ? (
+                                                <Image src={stickerPreview.src} alt="Sticker Preview" width={250} height={250} className="block main-button" />
+                                            ) : (
+                                                <video src={stickerPreview.src} controls className="max-w-full h-auto" />
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>

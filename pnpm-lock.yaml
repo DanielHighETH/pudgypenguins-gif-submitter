@@ -5,12 +5,18 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@uploadthing/react':
+    specifier: ^6.0.0
+    version: 6.0.0(next@14.0.1)(react@18.2.0)(uploadthing@6.0.1)
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
   ethers:
     specifier: 5.7.2
     version: 5.7.2
+  formidable:
+    specifier: ^3.5.1
+    version: 3.5.1
   mongodb:
     specifier: ^6.2.0
     version: 6.2.0
@@ -26,8 +32,14 @@ dependencies:
   twitter-api-sdk:
     specifier: ^1.2.1
     version: 1.2.1
+  uploadthing:
+    specifier: ^6.0.1
+    version: 6.0.1
 
 devDependencies:
+  '@types/formidable':
+    specifier: ^3.4.5
+    version: 3.4.5
   '@types/node':
     specifier: ^20
     version: 20.8.10
@@ -605,6 +617,12 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@types/formidable@3.4.5:
+    resolution: {integrity: sha512-s7YPsNVfnsng5L8sKnG/Gbb2tiwwJTY1conOkJzTMRvJAlLFW1nEua+ADsJQu8N1c0oTHx9+d5nqg10WuT9gHQ==}
+    dependencies:
+      '@types/node': 20.8.10
+    dev: true
+
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
@@ -713,6 +731,42 @@ packages:
   /@ungap/structured-clone@1.2.0:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
+
+  /@uploadthing/mime-types@0.2.2:
+    resolution: {integrity: sha512-ZUo1JHOPPMZDsUw1mOhhVDIvJGlsjj6T0xJ/YJtulyJwL43S9B5pxg1cHcRuTEgjaxj7B55jiqQ6r9mDrrjH9A==}
+    dev: false
+
+  /@uploadthing/react@6.0.0(next@14.0.1)(react@18.2.0)(uploadthing@6.0.1):
+    resolution: {integrity: sha512-s+6crwgoXRY9opip7S3g6iV1dIR2uMedXjlfQfMRM6GkVUmwHp8hkjtutpcnsdm37SukjubWuaAlqbUAmxYB5g==}
+    peerDependencies:
+      next: 14.0.1
+      react: ^17.0.2 || ^18.0.0
+      uploadthing: ^6.0.0
+    peerDependenciesMeta:
+      next:
+        optional: true
+    dependencies:
+      '@uploadthing/shared': 6.0.0(@uploadthing/mime-types@0.2.2)
+      attr-accept: 2.2.2
+      file-selector: 0.6.0
+      next: 14.0.1(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      tailwind-merge: 1.14.0
+      uploadthing: 6.0.1
+    transitivePeerDependencies:
+      - '@uploadthing/mime-types'
+    dev: false
+
+  /@uploadthing/shared@6.0.0(@uploadthing/mime-types@0.2.2):
+    resolution: {integrity: sha512-1utPnQxluUxShO095IGOeU3NT0nERVSlY97R8c0dcIoDc689CRX7BFrBws58PuWuAhmPp2Mjyo1e9wn3rSBjgg==}
+    peerDependencies:
+      '@uploadthing/mime-types': ^0.2.2
+    peerDependenciesMeta:
+      '@uploadthing/mime-types':
+        optional: true
+    dependencies:
+      '@uploadthing/mime-types': 0.2.2
+    dev: false
 
   /abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -863,6 +917,10 @@ packages:
       is-shared-array-buffer: 1.0.2
     dev: true
 
+  /asap@2.0.6:
+    resolution: {integrity: sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==}
+    dev: false
+
   /ast-types-flow@0.0.7:
     resolution: {integrity: sha512-eBvWn1lvIApYMhzQMsu9ciLfkBY499mFZlNqG+/9WR7PVlroQw0vG30cOQQbaKz3sCEc44TAOu2ykzqXSNnwag==}
     dev: true
@@ -872,6 +930,11 @@ packages:
     dependencies:
       has-symbols: 1.0.3
     dev: true
+
+  /attr-accept@2.2.2:
+    resolution: {integrity: sha512-7prDjvt9HmqiZ0cl5CRjtS84sEyhsHP2coDkaZKRKVfCDo9s7iw7ChVmar78Gu9pC4SoR/28wFu/G5JJhTnqEg==}
+    engines: {node: '>=4'}
+    dev: false
 
   /autoprefixer@10.4.16(postcss@8.4.31):
     resolution: {integrity: sha512-7vd3UC6xKp0HLfua5IjZlcXvGAGy7cBAXTg2lyQ/8WpNhd6SiZ8Be+xm3FyBSYJx5GKcpRCzBh7RH4/0dnY+uQ==}
@@ -1107,6 +1170,13 @@ packages:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
     dev: true
+
+  /dezalgo@1.0.4:
+    resolution: {integrity: sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==}
+    dependencies:
+      asap: 2.0.6
+      wrappy: 1.0.2
+    dev: false
 
   /didyoumean@1.2.2:
     resolution: {integrity: sha512-gxtyfqMg7GKyhQmb056K7M3xszy/myH8w+B4RT+QXBQsvAOdc3XymqDDPHx1BgPgsdAA5SIifona89YtRATDzw==}
@@ -1622,6 +1692,13 @@ packages:
       flat-cache: 3.1.1
     dev: true
 
+  /file-selector@0.6.0:
+    resolution: {integrity: sha512-QlZ5yJC0VxHxQQsQhXvBaC7VRJ2uaxTf+Tfpu4Z/OcVQJVpZO+DGU0rkoVW5ce2SccxugvpBJoMvUs59iILYdw==}
+    engines: {node: '>= 12'}
+    dependencies:
+      tslib: 2.6.2
+    dev: false
+
   /fill-range@7.0.1:
     resolution: {integrity: sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==}
     engines: {node: '>=8'}
@@ -1655,6 +1732,14 @@ packages:
     dependencies:
       is-callable: 1.2.7
     dev: true
+
+  /formidable@3.5.1:
+    resolution: {integrity: sha512-WJWKelbRHN41m5dumb0/k8TeAx7Id/y3a+Z7QfhxP/htI9Js5zYaEDtG8uMgG0vM0lOlqnmjE99/kfpOYi/0Og==}
+    dependencies:
+      dezalgo: 1.0.4
+      hexoid: 1.0.0
+      once: 1.4.0
+    dev: false
 
   /fraction.js@4.3.7:
     resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
@@ -1853,6 +1938,11 @@ packages:
     dependencies:
       function-bind: 1.1.2
     dev: true
+
+  /hexoid@1.0.0:
+    resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
+    engines: {node: '>=8'}
+    dev: false
 
   /hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
@@ -2423,7 +2513,6 @@ packages:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
     dependencies:
       wrappy: 1.0.2
-    dev: true
 
   /optionator@0.9.3:
     resolution: {integrity: sha512-JjCoypp+jKn1ttEFExxhetCKeJt9zhAgAve5FXHixTvFDW/5aEktX9bufBKLRRMdU7bNtpLfcGu94B3cdEJgjg==}
@@ -2893,6 +2982,10 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
+    dev: false
+
   /tailwindcss@3.3.5:
     resolution: {integrity: sha512-5SEZU4J7pxZgSkv7FP1zY8i2TIAOooNZ1e/OGtxIEv6GltpoiXUqWvLy89+a10qYTB1N5Ifkuw9lqQkN9sscvA==}
     engines: {node: '>=14.0.0'}
@@ -3079,6 +3172,14 @@ packages:
       picocolors: 1.0.0
     dev: true
 
+  /uploadthing@6.0.1:
+    resolution: {integrity: sha512-1gXOTAbRx/l27TLZlZCOhucOxIwGCR6H865AgYQuWQQaYmg/EvS94udcu/+cRKHvjEvDEclUE20qCDXrROTSUg==}
+    engines: {node: '>=18.13.0'}
+    dependencies:
+      '@uploadthing/mime-types': 0.2.2
+      '@uploadthing/shared': 6.0.0(@uploadthing/mime-types@0.2.2)
+    dev: false
+
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
@@ -3179,7 +3280,6 @@ packages:
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-    dev: true
 
   /ws@7.4.6:
     resolution: {integrity: sha512-YmhHDO4MzaDLB+M9ym/mDA5z0naX8j7SIlT8f8z+I0VtzsRbekxEutHSme7NPS2qE8StCYQNUnfWdXta/Yu85A==}
