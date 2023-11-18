@@ -10,7 +10,7 @@ export const ourFileRouter = {
     // Set permissions and file types for this FileRoute
     .onUploadComplete(async ({ metadata, file }) => {
       return { success: true, url: file.url };
-    }),
+    }), 
 } satisfies FileRouter;
  
 export type OurFileRouter = typeof ourFileRouter;
