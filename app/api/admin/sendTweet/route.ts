@@ -38,7 +38,6 @@ async function sendTweet(firstTweetText: string, imageUrl: string, secondTweetTe
             return (secondTweet.data.id, tweet.data.id);
         } catch (error) {
             return error
-            console.log(error);
         }
     })();
 }

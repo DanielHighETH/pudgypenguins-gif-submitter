@@ -26,7 +26,6 @@ function PendingDetail({ params }: { params: { id: string } }) {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data)
                 setGif(data.submission);
                 setLoading(false);
             });

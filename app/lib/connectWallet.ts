@@ -45,7 +45,6 @@ async function connectWallet(connectionType: ConnectionType): Promise<string | n
 
       if (response.ok) {
         const data = await response.json();
-        console.log('User inserted successfully:', data);
       } else {
         console.error('Failed to insert user. Response:', response);
       }

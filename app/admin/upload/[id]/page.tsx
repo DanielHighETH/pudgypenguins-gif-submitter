@@ -219,7 +219,6 @@ function Upload({ params }: { params: { id: string } }) {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data)
                     setUploadSuccess(true)
                     setUploading(false)
                     alert("Fully uploaded")
