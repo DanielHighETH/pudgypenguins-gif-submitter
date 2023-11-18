@@ -22,7 +22,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
         //giphy upload
         const giphyBody = {
             file: body.file,
-            username: body.username,
+            username: process.env.GIPHY_USERNAME || 'Pudgy Penguins',
             tags: body.tags,
             source_post_url: body.source_post_url,
             sticker: body.sticker,

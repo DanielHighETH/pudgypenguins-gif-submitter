@@ -27,7 +27,6 @@ interface Preview {
 }
 
 function Upload({ params }: { params: { id: string } }) {
-    const giphyUsername = 'DanielHighETH';
     //gif submission
     const [gif, setGif] = useState<GifSubmission | null>(null);
 
@@ -201,7 +200,6 @@ function Upload({ params }: { params: { id: string } }) {
 
         const body = {
             //title,
-            username: giphyUsername,
             tags: commaTags,
             source_post_url: urlSource,
             file: gifUrl,
