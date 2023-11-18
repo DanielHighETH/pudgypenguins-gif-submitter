@@ -40,6 +40,10 @@ function Upload({ params }: { params: { id: string } }) {
     const [tags, setTags] = useState<Tag[]>([]);
     const [urlSource, setUrlSource] = useState<string>('https://pudgypenguins.com/');
 
+    // file upload urls
+    const [gifUrl, setGifUrl] = useState<string>('');
+    const [stickerUrl, setStickerUrl] = useState<string>('');
+
 
     //preview
     const [gifPreview, setGifPreview] = useState<Preview>({ src: '', type: '', file: null });
@@ -51,19 +55,22 @@ function Upload({ params }: { params: { id: string } }) {
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [uploadError, setUploadError] = useState<String>("");
 
+    const [gifUpload, setGifUpload] = useState(false);
+
+    const [waitMessage, setWaitMessage] = useState(false);
+
 
     //Upload Thing
     const { startUpload, permittedFileInfo } = useUploadThing(
         "imageUploader",
         {
             onClientUploadComplete: () => {
-                alert("uploaded successfully!");
+                setGifUpload(false)
+                console.log("uploaded successfully!");
             },
             onUploadError: () => {
-                alert("error occurred while uploading");
-            },
-            onUploadBegin: () => {
-                alert("upload has begun");
+                setGifUpload(false)
+                console.error("error occurred while uploading");
             },
         },
     );
@@ -162,29 +169,38 @@ function Upload({ params }: { params: { id: string } }) {
             isSticker ? setStickerPreview(result) : setGifPreview(result);
         };
         reader.readAsDataURL(file);
+
+        //seamless upload to uploadthing
+
+        const gifUpload = await startUpload([file])
+        if (gifUpload) {
+            setGifUrl(gifUpload[0].url)
+        }
+        if (isSticker) {
+            const stickerUpload = await startUpload([file])
+            if (stickerUpload) {
+                setStickerUrl(stickerUpload[0].url)
+            }
+        }
+
     };
 
     async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        setUploading(true);
-        let gifUrl = '';
-        let stickerUrl = '';
-        if (stickerPreview.file) {
-            const start = await startUpload([gifPreview.file as File, stickerPreview.file as File])
-            if (start) {
-                gifUrl = start[0].url;
-                stickerUrl = start[1].url;
-            }
-        } else {
-            const start = await startUpload([gifPreview.file as File])
-            if (start) {
-                gifUrl = start[0].url;
-            }
+        if(!tags.length || !urlSource ){
+            alert("Please fill out TAGS and URL Source fields")
+            return;
         }
+
+        if(!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)){
+            setWaitMessage(true)
+            return;
+        }
+        setUploading(true);
         const commaTags = tags.join(',');
 
         const body = {
-            title,
+            //title,
             username: giphyUsername,
             tags: commaTags,
             source_post_url: urlSource,
@@ -204,8 +220,8 @@ function Upload({ params }: { params: { id: string } }) {
                 .then((response) => response.json())
                 .then((data) => {
                     console.log(data)
-                    setUploadSuccess(true);
-                    setUploading(false);
+                    setUploadSuccess(true)
+                    setUploading(false)
                     alert("Fully uploaded")
                     //send alert
                     //router.push('/admin/approved');
@@ -243,7 +259,7 @@ function Upload({ params }: { params: { id: string } }) {
 
                     <div className='bg-white shadow-lg rounded-lg p-6 mt-10'>
                         <form onSubmit={handleUpload} className="upload-form space-y-6">
-                            <div>
+                            {/* <div>
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl mt-5'>GIF Title</h3>
                                 <input
                                     type="text"
@@ -252,6 +268,84 @@ function Upload({ params }: { params: { id: string } }) {
                                     required
                                     className="form-input w-full"
                                 />
+                            </div> */}
+                            <div>
+                                <h3 className='text-2xl md:text-3xl lg:text-4xl pt-5'>Gif & Sticker Upload</h3>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" onChange={handleStickerToggle} className="form-checkbox" />
+                                    <span>Add a Sticker to Your GIF</span>
+                                </label>
+                            </div>
+
+                            <div className="flex gap-4 mt-4">
+                                <div className={`file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center ${isStickerSelected ? 'w-1/2' : 'w-full'}`}
+                                    onDragOver={(e) => e.preventDefault()}
+                                    onDrop={handleFileDrop}>
+                                    <input type="file"
+                                        id="gif-upload"
+                                        onChange={handleFileChange}
+                                        accept="image/gif,video/mp4,video/mov,video/webm"
+                                            name="gif"
+                                        hidden />
+                                    <label htmlFor="gif-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
+                                        <Image
+                                            src="/upload.png"
+                                            width={75}
+                                            height={75}
+                                            alt="Upload GIF icon"
+                                        />
+                                        <p className="mt-5">
+                                            Drag and drop your <strong>GIF</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the GIF</span>
+                                        </p>
+                                    </label>
+                                </div>
+                                {isStickerSelected && (
+                                    <div className="file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center w-1/2"
+                                        onDragOver={(e) => e.preventDefault()}
+                                        onDrop={(e) => handleFileDrop(e, true)}>
+                                        <input type="file"
+                                            id="sticker-upload"
+                                            onChange={(e) => handleFileChange(e, true)}
+                                            accept="image/gif,video/mp4,video/mov,video/webm"
+                                            name="sticker"
+                                            hidden />
+                                        <label htmlFor="sticker-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
+                                            <Image
+                                                src="/upload.png"
+                                                width={75}
+                                                height={75}
+                                                alt="Upload Sticker icon"
+                                            />
+                                            <p className="mt-5">
+                                                Drag and drop your <strong>Sticker</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the Sticker</span>
+                                            </p>
+                                        </label>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex w-full">
+                                <div className={`${isStickerSelected ? 'w-1/2' : 'w-full'}`}>
+                                    {(gifPreview && gifPreview.src) && (
+                                        <div className="preview flex justify-center mt-4">
+                                            {gifPreview.type.startsWith('image/') ? (
+                                                <Image src={gifPreview.src} alt="Preview" width={250} height={250} className="block main-button" />
+                                            ) : (
+                                                <video src={gifPreview.src} controls className="max-w-full h-auto" />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                                {(stickerPreview && stickerPreview.src && isStickerSelected) && (
+                                    <div className="w-1/2">
+                                        <div className="preview flex justify-center mt-4">
+                                            {stickerPreview.type.startsWith('image/') ? (
+                                                <Image src={stickerPreview.src} alt="Sticker Preview" width={250} height={250} className="block main-button" />
+                                            ) : (
+                                                <video src={stickerPreview.src} controls className="max-w-full h-auto" />
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                             <div className="flex flex-col">
                                 <h3 className='text-2xl md:text-3xl lg:text-4xl mt-5'>GIF Tags</h3>
@@ -297,86 +391,19 @@ function Upload({ params }: { params: { id: string } }) {
                                     onChange={(e) => setTweetText(e.target.value)}
                                     className="form-input w-full" />
                             </div>
-                            <div>
-                                <h3 className='text-2xl md:text-3xl lg:text-4xl pt-5'>Gif & Sticker Upload</h3>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" onChange={handleStickerToggle} className="form-checkbox" />
-                                    <span>Add a Sticker to Your GIF</span>
-                                </label>
-                            </div>
 
-                            <div className="flex gap-4 mt-4">
-                                <div className={`file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center ${isStickerSelected ? 'w-1/2' : 'w-full'}`}
-                                    onDragOver={(e) => e.preventDefault()}
-                                    onDrop={handleFileDrop}>
-                                    <input type="file"
-                                        id="gif-upload"
-                                        onChange={handleFileChange}
-                                        accept="image/gif,video/mp4,video/mov,video/webm"
-                                        required
-                                        hidden />
-                                    <label htmlFor="gif-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
-                                        <Image
-                                            src="/upload.png"
-                                            width={75}
-                                            height={75}
-                                            alt="Upload GIF icon"
-                                        />
-                                        <p className="mt-5">
-                                            Drag and drop your <strong>GIF</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the GIF</span>
-                                        </p>
-                                    </label>
-                                </div>
-                                {isStickerSelected && (
-                                    <div className="file-drop-area form-input rounded-lg p-6 transition-all flex justify-center items-center w-1/2"
-                                        onDragOver={(e) => e.preventDefault()}
-                                        onDrop={(e) => handleFileDrop(e, true)}>
-                                        <input type="file"
-                                            id="sticker-upload"
-                                            onChange={(e) => handleFileChange(e, true)}
-                                            accept="image/gif,video/mp4,video/mov,video/webm"
-                                            required
-                                            hidden />
-                                        <label htmlFor="sticker-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
-                                            <Image
-                                                src="/upload.png"
-                                                width={75}
-                                                height={75}
-                                                alt="Upload Sticker icon"
-                                            />
-                                            <p className="mt-5">
-                                                Drag and drop your <strong>Sticker</strong> here or <span className="text-sky-blue underline cursor-pointer">click to select the Sticker</span>
-                                            </p>
-                                        </label>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="flex w-full">
-                                <div className={`${isStickerSelected ? 'w-1/2' : 'w-full'}`}>
-                                    {(gifPreview && gifPreview.src) && (
-                                        <div className="preview flex justify-center mt-4">
-                                            {gifPreview.type.startsWith('image/') ? (
-                                                <Image src={gifPreview.src} alt="Preview" width={250} height={250} className="block main-button" />
-                                            ) : (
-                                                <video src={gifPreview.src} controls className="max-w-full h-auto" />
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                                {(stickerPreview && stickerPreview.src && isStickerSelected) && (
-                                    <div className="w-1/2">
-                                        <div className="preview flex justify-center mt-4">
-                                            {stickerPreview.type.startsWith('image/') ? (
-                                                <Image src={stickerPreview.src} alt="Sticker Preview" width={250} height={250} className="block main-button" />
-                                            ) : (
-                                                <video src={stickerPreview.src} controls className="max-w-full h-auto" />
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                            {waitMessage && (
+                                <div className="text-red-500">Please wait until the GIF is uploaded</div>
+                            )}
+
                             <div>
-                                <button type="submit" className="main-button py-2 px-4 w-full">Upload</button>
+                                <button
+                                    type="submit"
+                                    className="main-button py-2 px-4 w-full"
+                                    //disabled={!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)}    
+                                >
+                                    Upload
+                                </button>
                             </div>
                         </form>
 

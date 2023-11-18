@@ -43,30 +43,49 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
             return NextResponse.json({ error: giphyUpload, giphyFailed: true }, { status: 403 });
         }
 
-        return NextResponse.json({ giphyUpload, giphyFailed: false }, { status: 200 });
+        const giphyUploadJson = await giphyUpload.json();
+        const giphyUrl = `https://giphy.com/gifs/${giphyUploadJson.giphyUpload.data.id}`;
 
-        //google disk upload here -> tweet -> update status
-    } catch (error) {
-        console.log(error)
-        return NextResponse.json({ error: error}, { status: 403 });
+
+        //SEND TWEET
+        const tweetBody = {
+            tweet: body.tweetText,
+            gifUrl: body.file,
+            giphyUrl,
+        }
+
+        const sendTweet = await fetch(`${BASE_URL}/api/admin/sendTweet`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Wallet-Address': walletAddress,
+                'Signature': signature,
+                'Signed-Message': signedMessage,
+            },
+            body: JSON.stringify(tweetBody),
+        });
+
+        if (!sendTweet.ok) {
+            return NextResponse.json({ error: sendTweet, giphyFailed: false, tweetFailed: true }, { status: 403 });
+        }
+
+        //update status
+
+        const statusUpdate = await fetch(`${BASE_URL}/api/admin/updateGif/${params.id}/uploaded`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Wallet-Address': walletAddress,
+                'Signature': signature,
+                'Signed-Message': signedMessage,
+            },
+        });
+
+        if (!statusUpdate.ok) {
+            return NextResponse.json({ error: statusUpdate, giphyFailed: false, tweetFailed: false, statusFailed: true }, { status: 403 });
+        }
+         return NextResponse.json({ giphyUpload, giphyUploadJson, sendTweet }, { status: 200 });
+    } catch (error: any) {
+        return NextResponse.json({ error: error.message }, { status: 403 });
     }
-
-
-    //update status
-    //     try{
-    //     const response = await fetch(`${BASE_URL}/api/admin/updateGif/${params.id}/uploaded`, {
-    //         method: 'GET',
-    //         headers: {
-    //           'Content-Type': 'application/json',
-    //         },
-    //       });
-
-    //       if (response.ok) {
-    //         //this will be finish of an upload            
-    //       } else {
-    //         return NextResponse.json({ error: response }, { status: 403 });
-    //     }
-    // } catch(error){
-    //     return NextResponse.json({ error: error }, { status: 403 });
-    // }
 }
