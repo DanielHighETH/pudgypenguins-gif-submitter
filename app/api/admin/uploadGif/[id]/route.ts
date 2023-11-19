@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
 import authorizeAdmin from '@/app/lib/authorizeAdmin';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string, status: string } }) {
@@ -19,19 +19,6 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
     }
 
     try {
-        const giphyBody = {
-            file: body.file,
-            username: process.env.GIPHY_USERNAME || 'Pudgy Penguins',
-            tags: body.tags,
-            source_post_url: body.source_post_url,
-            sticker: body.sticker,
-        };
-
-        const tweetBody = {
-            tweet: body.tweetText,
-            gifUrl: body.file
-        };
-
         const headers = {
             'Content-Type': 'application/json',
             'Wallet-Address': walletAddress,
@@ -39,39 +26,61 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
             'Signed-Message': signedMessage,
         };
 
-        // Parallel execution of Giphy upload and Tweet send
-        const [giphyUpload, sendTweet] = await Promise.all([
-            fetch(`${BASE_URL}/api/admin/uploadToGiphy`, { method: 'POST', headers, body: JSON.stringify(giphyBody) }),
-            fetch(`${BASE_URL}/api/admin/sendTweet`, { method: 'POST', headers, body: JSON.stringify(tweetBody) })
-        ]);
 
-        if (!giphyUpload.ok || !sendTweet.ok) {
-            return NextResponse.json({ 
-                error: "Failed to upload to Giphy or send Tweet",
-                giphyFailed: !giphyUpload.ok,
-                tweetFailed: !sendTweet.ok
-            }, { status: 403 });
+        //giphy upload
+        const giphyBody = {
+            file: body.file,
+            username: process.env.GIPHY_USERNAME || 'Pudgy Penguins',
+            tags: body.tags,
+            source_post_url: body.source_post_url,
+            sticker: body.sticker,
         }
 
-        const [giphyUploadJson, sendTweetJson] = await Promise.all([
-            giphyUpload.json(),
-            sendTweet.json()
-        ]);
+        const giphyUpload = await fetch(`${BASE_URL}/api/admin/uploadToGiphy`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(giphyBody),
+        });
 
+        if (!giphyUpload.ok) {
+            return NextResponse.json({ error: giphyUpload, giphyFailed: true }, { status: 403 });
+        }
+
+        const giphyUploadJson = await giphyUpload.json();
         const giphyUrl = `https://giphy.com/gifs/${giphyUploadJson.giphyUpload.data.id}`;
-        const tweetUrl = `https://twitter.com/${process.env.ACCOUNT_NAME}/status/${sendTweetJson.tweetId}`;
 
-        // Parallel execution of status update and adding additional info
-        const statusUpdate = fetch(`${BASE_URL}/api/admin/updateGif/${params.id}/uploaded`, { method: 'PUT', headers });
-        const addInfo = fetch(`${BASE_URL}/api/admin/addGifInfo/${params.id}`, {
+
+        //SEND TWEET
+        const tweetBody = {
+            tweet: body.tweetText,
+            gifUrl: body.file,
+            giphyUrl,
+        }
+
+        const sendTweet = await fetch(`${BASE_URL}/api/admin/sendTweet`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(tweetBody),
+        });
+        
+        const sendTweetJson = await sendTweet.json();
+        const tweetUrl = `https://twitter.com/${process.env.ACCOUNT_NAME}/status/${sendTweetJson.tweetId}`
+
+        if (!sendTweet.ok) {
+            return NextResponse.json({ error: sendTweet, giphyFailed: false, tweetFailed: true }, { status: 403 });
+        }
+
+        //update status
+        const statusUpdatePromise = fetch(`${BASE_URL}/api/admin/updateGif/${params.id}/uploaded`, { method: 'PUT', headers });
+        const addInfoPromise = fetch(`${BASE_URL}/api/admin/addGifInfo/${params.id}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify({ giphyUrl, giphyId: giphyUploadJson.giphyUpload.data.id, tweetUrl })
         });
 
-        await Promise.all([statusUpdate, addInfo]);
+        await Promise.all([statusUpdatePromise, addInfoPromise]);
 
-        return NextResponse.json({ uploaded: true }, { status: 200 });
+         return NextResponse.json({ uploaded: true }, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 403 });
     }
