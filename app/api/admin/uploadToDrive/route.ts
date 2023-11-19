@@ -14,10 +14,11 @@ function bufferToStream(buffer: Buffer) {
   return stream;
 }
 
+const privateKey = process.env.GOOGLE_PRIVATE_KEY as string;
 const auth = new google.auth.GoogleAuth({
   credentials: {
       client_email: process.env.GOOGLE_CLIENT_EMAIL,
-      private_key: process.env.GOOGLE_PRIVATE_KEY,
+      private_key: privateKey.split(String.raw`\n`).join('\n'),
     },
   scopes: ['https://www.googleapis.com/auth/drive'],
 });
