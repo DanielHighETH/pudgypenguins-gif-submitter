@@ -2,7 +2,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'
-import FilterComponent from '@/app/components/FilterComponent';
+import FilterComponentUsers from '@/app/components/FilterComponentUsers';
 import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 
@@ -34,7 +34,7 @@ function UserUploaded() {
         <div className='xl:mx-44 md:mx-24 mx-8'>
             <h1 className='text-4xl text-cemter md:text-5xl md:text-left mt-5 mb-5'>My Uploaded Gifs</h1>
 
-            <FilterComponent
+            <FilterComponentUsers
                 submissions={submissions}
                 setFilteredSubmissions={setFilteredSubmissions}
             />
