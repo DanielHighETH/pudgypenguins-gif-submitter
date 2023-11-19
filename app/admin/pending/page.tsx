@@ -7,6 +7,7 @@ import Loader from '@/app/components/Loader';
 import { Submission } from '@/app/components/interfaces';
 import OnlyAdmin from "@/app/components/OnlyAdmin";
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
+import { useAlert } from '@/app/components/UseAlert';
 
 function Pending() {
     const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -14,6 +15,7 @@ function Pending() {
     const [loading, setLoading] = useState(false);
     const fetchWithAuth = useAuthenticatedFetch();
 
+    const { showMessage } = useAlert();
 
     const router = useRouter()
 
@@ -33,6 +35,7 @@ function Pending() {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
+                showMessage('GIF was successfuly approved');
                 const updatedSubmissions = submissions.filter((submission) => submission._id !== id);
                 setSubmissions(updatedSubmissions);
             }
@@ -44,6 +47,7 @@ function Pending() {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
+                showMessage('GIF was successfuly rejected');
                 const updatedSubmissions = submissions.filter((submission) => submission._id !== id);
                 setSubmissions(updatedSubmissions);
             }
