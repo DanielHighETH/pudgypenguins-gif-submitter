@@ -1,5 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
+import { useAlert } from '@/app/components/UseAlert';
+
 
 export default function Home() {
 
@@ -13,6 +15,9 @@ export default function Home() {
 
   const [penguinID, setPenguinID] = useState<string>('');
   const [penguinIDError, setPenguinIDError] = useState<string>('');
+
+  const { showMessage } = useAlert();
+
 
   const handleSubmit = async () => {
     let hasError = false;
@@ -55,17 +60,17 @@ export default function Home() {
         });
 
         if (response.ok) {
-          alert("Data successfully submitted!");
+          showMessage('Your idea was successfully submitted!');
           // Reset form data
           setTwitterUsername('');
           setWalletAddress(walletAddress);
           setGifIdea('');
           setPenguinID('');
         } else {
-          alert("Something went wrong!");
+          showMessage('Something went wrong, please try again later!');
         }
       } catch (error) {
-        alert("Error while submitting data.");
+        showMessage('Error while submitting your idea, please try again later!');
       }
     }
   }

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation"
 import Loader from '@/app/components/Loader';
 import OnlyAdmin from '@/app/components/OnlyAdmin';
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
+import { useAlert } from '@/app/components/UseAlert';
+
 
 type GifSubmission = {
     twitterUsername: string;
@@ -21,6 +23,8 @@ function PendingDetail({ params }: { params: { id: string } }) {
 
     const router = useRouter();
 
+    const { showMessage } = useAlert();
+
     useEffect(() => {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
             .then((response) => response.json())
@@ -30,17 +34,13 @@ function PendingDetail({ params }: { params: { id: string } }) {
             });
     }, [params.id, fetchWithAuth]);
 
-    const uploadGif = (id: string) => {
-        //upload logic
-    };
-
     const rejectGif = (id: string) => {
         fetchWithAuth(`/api/admin/updateGif/${id}/rejected`, {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
+                showMessage('GIF was successfuly rejected');
                 router.push('/admin/approved');
-                //alert response
             }
         })
     };
@@ -71,13 +71,13 @@ function PendingDetail({ params }: { params: { id: string } }) {
                         <p className='mb-4'><strong>Penguin #:</strong> {gif.penguinID}</p>
                         <p className='mb-4'><strong>Wallet Address:</strong> {gif.userWallet}</p>
                         <p className='mb-4'><strong>Status:</strong> {gif.status}</p>
-                        
+
                         <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start">
                             <button className="px-3 py-2 rounded-md bg-white text-oxford-blue border-2 border-oxford-blue hover:bg-sky-blue hover:text-dark"
                                 onClick={() => router.back}>Back</button>
 
                             <button className="px-3 py-2 rounded-md bg-white text-oxford-blue border-2 border-oxford-blue hover:bg-sky-blue hover:text-dark"
-                                onClick={() => uploadGif(params.id)}>Upload</button>
+                                onClick={() => router.push(`/admin/upload/${params.id}`)}>Upload</button>
 
                             <button className="px-3 py-2 rounded-md bg-white text-oxford-blue border-2 border-oxford-blue hover:bg-sky-blue hover:text-dark"
                                 onClick={() => rejectGif(params.id)}>Reject</button>

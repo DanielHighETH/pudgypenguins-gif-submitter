@@ -23,6 +23,10 @@ a {
   text-decoration: none;
 }
 
+.navbarText{
+  text-shadow: 3px 3px 0 var(--oxford-blue);
+}
+
 h1 {
   font-family: var(--font-typeType), sans-serif;
   color: var(--sky-blue);

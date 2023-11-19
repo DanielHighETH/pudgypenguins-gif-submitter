@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import Loader from '@/app/components/Loader';
 import OnlyAdmin from "@/app/components/OnlyAdmin";
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
+import { useAlert } from '@/app/components/UseAlert';
 
 type GifSubmission = {
     twitterUsername: string;
@@ -21,6 +22,8 @@ function PendingDetail({ params }: { params: { id: string } }) {
 
     const router = useRouter();
 
+    const { showMessage } = useAlert();
+
     useEffect(() => {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
             .then((response) => response.json())
@@ -35,8 +38,8 @@ function PendingDetail({ params }: { params: { id: string } }) {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
+                showMessage('GIF was successfuly approved')
                 router.push('/admin/pending');
-                //alert response
             }
         })
     };
@@ -46,8 +49,8 @@ function PendingDetail({ params }: { params: { id: string } }) {
             method: 'PUT',
         }).then((response) => {
             if (response.ok) {
+                showMessage('GIF was successfuly rejected');
                 router.push('/admin/pending');
-                //alert response
             }
         })
     };

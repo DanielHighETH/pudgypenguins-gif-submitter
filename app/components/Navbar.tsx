@@ -45,7 +45,7 @@ function Navbar() {
 
   return (
     <nav className="flex justify-between items-center py-4 px-6 bg-sky-blue text-white">
-      <div className="font-typeType text-2xl">
+      <div className="font-typeType text-4xl navbarText">
         <Link href="/">PudgyGIFs</Link>
       </div>
       <div className="flex gap-4">

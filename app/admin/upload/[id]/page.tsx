@@ -73,9 +73,7 @@ function Upload({ params }: { params: { id: string } }) {
     const router = useRouter();
 
     //alert
-
     const { showMessage } = useAlert();
-
 
     useEffect(() => {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
@@ -168,7 +166,6 @@ function Upload({ params }: { params: { id: string } }) {
                         'Content-Type': 'application/json',
                     }
                 })
-                console.log("uploadToDrive")
                 const data = await uploadToDrive.json();
                 if (isSticker) {
                     setStickerUrl(data.details.webContentLink);

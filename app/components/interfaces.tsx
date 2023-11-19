@@ -9,4 +9,5 @@ export interface Submission {
     gifIdea: string;
     penguinID: string;
     userWallet: string;
+    status: string;
 }
