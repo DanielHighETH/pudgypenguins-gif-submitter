@@ -6,7 +6,6 @@ import Loader from '@/app/components/Loader';
 import OnlyAdmin from '@/app/components/OnlyAdmin';
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 import Image from 'next/image'
-import { useUploadThing } from "@/app/lib/useUploadThing";
 
 
 
@@ -54,25 +53,9 @@ function Upload({ params }: { params: { id: string } }) {
     const [uploadSuccess, setUploadSuccess] = useState(false);
     const [uploadError, setUploadError] = useState<String>("");
 
-    const [gifUpload, setGifUpload] = useState(false);
-
     const [waitMessage, setWaitMessage] = useState(false);
 
 
-    //Upload Thing
-    const { startUpload, permittedFileInfo } = useUploadThing(
-        "imageUploader",
-        {
-            onClientUploadComplete: () => {
-                setGifUpload(false)
-                console.log("uploaded successfully!");
-            },
-            onUploadError: () => {
-                setGifUpload(false)
-                console.error("error occurred while uploading");
-            },
-        },
-    );
 
     // tweet text
 
@@ -91,10 +74,7 @@ function Upload({ params }: { params: { id: string } }) {
 
     const [tweetText, setTweetText] = useState(getRandomTweet());
 
-
-
     const fetchWithAuth = useAuthenticatedFetch();
-
 
     const router = useRouter();
 
@@ -161,29 +141,60 @@ function Upload({ params }: { params: { id: string } }) {
         setIsStickerSelected(!isStickerSelected);
     };
 
+        // const processFile = async (file: File, isSticker: boolean) => {
+    //     const reader = new FileReader();
+    //     reader.onloadend = () => {
+    //         const result = { src: reader.result as string, type: file.type, file };
+    //         isSticker ? setStickerPreview(result) : setGifPreview(result);
+    //     };
+    //     reader.readAsDataURL(file);
+
+
+    //     const fileBuffer 
+
+    // };
+
     const processFile = async (file: File, isSticker: boolean) => {
+        const mimeType = file.type;
         const reader = new FileReader();
         reader.onloadend = () => {
-            const result = { src: reader.result as string, type: file.type, file };
+            const base64Data = reader.result as string;
+            const result = { src: base64Data, type: mimeType, file };
             isSticker ? setStickerPreview(result) : setGifPreview(result);
         };
-        reader.readAsDataURL(file);
+    
+        reader.onload = async () => {
+            if(reader.result){
+                const uri = reader.result as string;
+                const base64String = uri.split(',')[1];
 
-        //seamless upload to uploadthing
+                const body = {
+                    fileName: file.name,
+                    mimeType,
+                    fileContent: base64String,
+                }
 
-        const gifUpload = await startUpload([file])
-        if (gifUpload) {
-            setGifUrl(gifUpload[0].url)
-        }
-        if (isSticker) {
-            const stickerUpload = await startUpload([file])
-            if (stickerUpload) {
-                setStickerUrl(stickerUpload[0].url)
+                const uploadToDrive = await fetchWithAuth(`/api/admin/uploadToDrive`, {
+                    method: 'POST',
+                    body: JSON.stringify(body),
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                const data = await uploadToDrive.json();
+                if (isSticker) {
+                    setStickerUrl(data.details.webContentLink);
+                } else {
+                    setGifUrl(data.details.webContentLink);
+                }
             }
-        }
-
+        };
+        // Start by reading the file as a data URL (base64)
+        reader.readAsDataURL(file);
     };
 
+    
+    
     async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         if(!tags.length || !urlSource ){
