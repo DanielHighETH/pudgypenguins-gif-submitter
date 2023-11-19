@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import Navbar from './components/Navbar'
+import { AlertProvider } from '@/app/components/UseAlert';
+import Alert from '@/app/components/Alert';
 
 const kvant = localFont({
   src: '/fonts/Kvant - Menco-Medium.otf',
@@ -9,7 +11,7 @@ const kvant = localFont({
   variable: '--font-kvant',
 })
 
-const typeType = localFont({  
+const typeType = localFont({
   src: '/fonts/TypeType - TT Trailers ExtraBold.otf',
   display: 'swap',
   variable: '--font-typeType',
@@ -34,7 +36,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${kvant.variable} ${typeType.variable} ${fobble.variable}`}><Navbar/>{children}</body>
+      <body className={`${kvant.variable} ${typeType.variable} ${fobble.variable}`}>
+        <AlertProvider>
+          <Alert />
+          <Navbar />
+          {children}
+        </AlertProvider>
+      </body>
     </html>
   )
 }

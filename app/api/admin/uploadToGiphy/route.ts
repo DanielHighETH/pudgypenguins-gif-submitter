@@ -20,7 +20,7 @@ async function uploadToGiphy(uploadBody: GiphyUploadBody, apiKey: string) {
 
         return response.json();
     } catch(error){
-        return NextResponse.json({ error: error, test: "test" }, { status: 403 });
+        return NextResponse.json({ error: error }, { status: 403 });
     }
 }
 
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         const giphyBody = await req.json();        
         const apiKey = process.env.GIPHY_API_KEY as string;
 
-        // Upload the main file
+        // Upload the main gif
         const giphyUpload = await uploadToGiphy({
             source_image_url: giphyBody.file,
             username: giphyBody.username,

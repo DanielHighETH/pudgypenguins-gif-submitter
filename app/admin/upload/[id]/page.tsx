@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState, ChangeEvent, DragEvent, KeyboardEvent, useCallback } from "react"
+import { useEffect, useState, ChangeEvent, DragEvent, KeyboardEvent } from "react"
 import { useRouter } from "next/navigation"
 import Loader from '@/app/components/Loader';
 import OnlyAdmin from '@/app/components/OnlyAdmin';
 import useAuthenticatedFetch from '@/app/lib/authenticatedFetch';
 import Image from 'next/image'
-
+import { useAlert } from '@/app/components/UseAlert';
 
 
 type GifSubmission = {
@@ -33,7 +33,7 @@ function Upload({ params }: { params: { id: string } }) {
     const [loading, setLoading] = useState(true);
 
     // form data
-    const [title, setTitle] = useState<string>('');
+    // const [title, setTitle] = useState<string>('');
     const [tagValue, setTagValue] = useState<string>('');
     const [tags, setTags] = useState<Tag[]>([]);
     const [urlSource, setUrlSource] = useState<string>('https://pudgypenguins.com/');
@@ -50,12 +50,6 @@ function Upload({ params }: { params: { id: string } }) {
 
     // uploading statuses
     const [uploading, setUploading] = useState(false);
-    const [uploadSuccess, setUploadSuccess] = useState(false);
-    const [uploadError, setUploadError] = useState<String>("");
-
-    const [waitMessage, setWaitMessage] = useState(false);
-
-
 
     // tweet text
 
@@ -77,6 +71,11 @@ function Upload({ params }: { params: { id: string } }) {
     const fetchWithAuth = useAuthenticatedFetch();
 
     const router = useRouter();
+
+    //alert
+
+    const { showMessage } = useAlert();
+
 
     useEffect(() => {
         fetchWithAuth(`/api/admin/getGifByID/${params.id}`)
@@ -141,19 +140,6 @@ function Upload({ params }: { params: { id: string } }) {
         setIsStickerSelected(!isStickerSelected);
     };
 
-        // const processFile = async (file: File, isSticker: boolean) => {
-    //     const reader = new FileReader();
-    //     reader.onloadend = () => {
-    //         const result = { src: reader.result as string, type: file.type, file };
-    //         isSticker ? setStickerPreview(result) : setGifPreview(result);
-    //     };
-    //     reader.readAsDataURL(file);
-
-
-    //     const fileBuffer 
-
-    // };
-
     const processFile = async (file: File, isSticker: boolean) => {
         const mimeType = file.type;
         const reader = new FileReader();
@@ -162,9 +148,9 @@ function Upload({ params }: { params: { id: string } }) {
             const result = { src: base64Data, type: mimeType, file };
             isSticker ? setStickerPreview(result) : setGifPreview(result);
         };
-    
+
         reader.onload = async () => {
-            if(reader.result){
+            if (reader.result) {
                 const uri = reader.result as string;
                 const base64String = uri.split(',')[1];
 
@@ -172,6 +158,7 @@ function Upload({ params }: { params: { id: string } }) {
                     fileName: file.name,
                     mimeType,
                     fileContent: base64String,
+                    id: params.id,
                 }
 
                 const uploadToDrive = await fetchWithAuth(`/api/admin/uploadToDrive`, {
@@ -181,6 +168,7 @@ function Upload({ params }: { params: { id: string } }) {
                         'Content-Type': 'application/json',
                     }
                 })
+                console.log("uploadToDrive")
                 const data = await uploadToDrive.json();
                 if (isSticker) {
                     setStickerUrl(data.details.webContentLink);
@@ -193,17 +181,17 @@ function Upload({ params }: { params: { id: string } }) {
         reader.readAsDataURL(file);
     };
 
-    
-    
+
+
     async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        if(!tags.length || !urlSource ){
-            alert("Please fill out TAGS and URL Source fields")
+        if (!tags.length || !urlSource) {
+            showMessage('Please fill out TAGS and URL Source fields');
             return;
         }
 
-        if(!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)){
-            setWaitMessage(true)
+        if (!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)) {
+            showMessage('Please wait until the GIF is uploaded and try again')
             return;
         }
         setUploading(true);
@@ -228,15 +216,12 @@ function Upload({ params }: { params: { id: string } }) {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    setUploadSuccess(true)
                     setUploading(false)
-                    alert("Fully uploaded")
-                    //send alert
-                    //router.push('/admin/approved');
+                    showMessage("Gif uploaded successfully!")
+                    router.push(`/uploaded/${params.id}`);
                 });
         } catch (error) {
             console.error(error)
-            setUploadError(error as String);
             setUploading(false);
         }
     }
@@ -293,7 +278,7 @@ function Upload({ params }: { params: { id: string } }) {
                                         id="gif-upload"
                                         onChange={handleFileChange}
                                         accept="image/gif,video/mp4,video/mov,video/webm"
-                                            name="gif"
+                                        name="gif"
                                         hidden />
                                     <label htmlFor="gif-upload" className="text-center text-oxford-blue font-kvant flex flex-col items-center justify-center">
                                         <Image
@@ -400,27 +385,21 @@ function Upload({ params }: { params: { id: string } }) {
                                     className="form-input w-full" />
                             </div>
 
-                            {waitMessage && (
-                                <div className="text-red-500">Please wait until the GIF is uploaded</div>
-                            )}
-
                             <div>
-                                <button
-                                    type="submit"
-                                    className="main-button py-2 px-4 w-full"
-                                    //disabled={!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)}    
-                                >
-                                    Upload
-                                </button>
+                                {uploading ? (
+                                    <Loader />
+                                ) : (
+                                    <button
+                                        type="submit"
+                                        className="main-button py-2 px-4 w-full"
+                                        // disabled={!gifUrl || (isStickerSelected && !stickerUrl) || (isStickerSelected && !gifUrl)}
+                                    >
+                                        Upload
+                                    </button>
+                                )}
                             </div>
                         </form>
-
-
-                        {uploading && <Loader />} {/* Show loader when uploading */}
-                        {uploadSuccess && <div>Upload Successful!</div>}
-                        {uploadError && <div>Error: {uploadError}</div>}
                     </div>
-
                 </>
             )}
         </div>

@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
 
         const dataToInsert = {
             twitterUsername: extractedTwitterUsername,
-            userWallet: walletAddress,
+            userWallet: walletAddress.toLowerCase(),
             gifIdea,
             penguinID,
             status: 'pending',

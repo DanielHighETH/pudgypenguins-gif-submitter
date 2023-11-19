@@ -10,8 +10,6 @@ function Admin() {
         { title: 'Approved Submissions', href: '/admin/approved', icon: '✅' },
         { title: 'Rejected Submissions', href: '/admin/rejected', icon: '❌' },
         { title: 'Uploaded Submissions', href: '/admin/uploaded', icon: '📤' },
-        { title: 'Users', href: '/admin/users', icon: '👤' },
-        { title: 'Logs', href: '/admin/logs', icon: '📚' },
     ];
 
     return (

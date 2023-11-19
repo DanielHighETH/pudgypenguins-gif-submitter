@@ -64,6 +64,9 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
             },
             body: JSON.stringify(tweetBody),
         });
+        
+        const sendTweetJson = await sendTweet.json();
+        const tweetUrl = `https://twitter.com/${process.env.ACCOUNT_NAME}/status/${sendTweetJson.tweetId}`
 
         if (!sendTweet.ok) {
             return NextResponse.json({ error: sendTweet, giphyFailed: false, tweetFailed: true }, { status: 403 });
@@ -84,7 +87,23 @@ export async function POST(req: NextRequest, { params }: { params: { id: string,
         if (!statusUpdate.ok) {
             return NextResponse.json({ error: statusUpdate, giphyFailed: false, tweetFailed: false, statusFailed: true }, { status: 403 });
         }
-         return NextResponse.json({ giphyUpload, giphyUploadJson, sendTweet }, { status: 200 });
+
+        const addInfo = await fetch(`${BASE_URL}/api/admin/addGifInfo/${params.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Wallet-Address': walletAddress,
+                'Signature': signature,
+                'Signed-Message': signedMessage,
+            },
+            body: JSON.stringify({ giphyUrl, giphyId: giphyUploadJson.giphyUpload.data.id, tweetUrl }),
+        });
+
+        if (!addInfo.ok) {
+            return NextResponse.json({ error: addInfo, giphyFailed: false, tweetFailed: false, statusFailed: false, addInfoFailed: true }, { status: 403 });
+        }
+
+         return NextResponse.json({ uploaded: true }, { status: 200 });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 403 });
     }
