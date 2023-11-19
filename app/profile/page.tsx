@@ -3,13 +3,10 @@ import React from 'react';
 import Link from 'next/link';
 import connectWallet from '../lib/connectWallet';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation'
 
 
 
 function Profile() {
-  const router = useRouter()
-
   const handleConnectWallet = async () => {
     try {
       const connectedAddress = await connectWallet("metamask");
@@ -48,7 +45,7 @@ function Profile() {
 
     sessionStorage.clear();  
     
-    window.location.href = "/"; // full refresh to avoid issues with next/link
+    window.location.href = "/"; // full refresh instead of router
 };
 
 
