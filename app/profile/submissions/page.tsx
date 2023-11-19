@@ -13,10 +13,9 @@ function UserSubmissions() {
 
 
     const router = useRouter()
-    const savedAddress = localStorage.getItem("walletAddress");
-
 
     useEffect(() => {
+        const savedAddress = localStorage.getItem("walletAddress");
         if(!savedAddress) {
             router.push('/profile');
         }
@@ -27,7 +26,7 @@ function UserSubmissions() {
                 setSubmissions(data);
                 setLoading(false);
             });
-    }, [router, savedAddress]);
+    }, [router]);
 
 
 

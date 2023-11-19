@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 
 function Profile() {
 
-    const [walletAddress, setWalletAddress] = useState<string>('');
 
     const handleConnectWallet = async () => {
         try {
@@ -35,7 +34,6 @@ function Profile() {
       useEffect(() => {
         const savedAddress = localStorage.getItem("walletAddress");
         if (savedAddress) {
-          setWalletAddress(savedAddress);
           fetchUserRole(savedAddress);
         } else {
             handleConnectWallet();
